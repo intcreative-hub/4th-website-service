@@ -11,6 +11,7 @@ import {
   Calendar,
   BookOpen,
   Users,
+  Star,
   LogOut,
   Menu,
   X,
@@ -25,6 +26,7 @@ const navItems = [
   { href: '/admin/orders', icon: ShoppingCart, label: 'Orders' },
   { href: '/admin/appointments', icon: Calendar, label: 'Appointments' },
   { href: '/admin/blog', icon: BookOpen, label: 'Blog' },
+  { href: '/admin/reviews', icon: Star, label: 'Reviews' },
   { href: '/admin/contacts', icon: Users, label: 'Contacts' },
 ]
 
