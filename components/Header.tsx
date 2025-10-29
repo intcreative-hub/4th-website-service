@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Phone } from "lucide-react";
 import { SITE_CONFIG, NAV_LINKS } from "@/lib/config";
 import CartDropdown from "@/components/CartDropdown";
+import AccountDropdown from "@/components/AccountDropdown";
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -96,10 +97,14 @@ export default function Header() {
 
               {/* Cart Dropdown */}
               <CartDropdown />
+
+              {/* Account Dropdown */}
+              <AccountDropdown />
             </div>
 
             {/* Mobile Menu Button & Cart */}
             <div className="flex items-center gap-2 md:hidden">
+              <AccountDropdown />
               <CartDropdown />
               <button
                 className="text-neutral-200 p-2 hover:text-primary-emerald transition-colors"
