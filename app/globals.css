@@ -1,0 +1,549 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* NEW: Sophisticated Color Palette */
+    --primary-purple: #5a2d82;      /* Deep purple - primary */
+    --primary-emerald: #0d7d6d;     /* Muted emerald - primary */
+    --accent-purple: #8b5cf6;       /* Medium purple - hover states */
+    --accent-emerald: #14b8a6;      /* Brighter emerald - accents only */
+
+    /* Dark Backgrounds & Surfaces */
+    --dark-bg: #0f172a;             /* Main dark background */
+    --darker-bg: #0a0f1a;           /* Darker for depth */
+    --card-bg: #1a2844;             /* Slightly lighter cards */
+
+    /* Neutral Grays */
+    --neutral-200: #e5e7eb;         /* Light text on dark */
+    --neutral-600: #4b5563;         /* Medium gray */
+
+    /* Accent Colors */
+    --cream: #f5f1e8;               /* Warm cream accent */
+    --charcoal: #1a1a1a;            /* Deep charcoal */
+
+    /* Legacy support (keep for gradual migration) */
+    --dark-card: var(--card-bg);
+    --emerald: var(--accent-emerald);
+    --emerald-light: var(--accent-emerald);
+    --purple: var(--accent-purple);
+    --light-text: var(--neutral-200);
+
+    /* Font Variables */
+    --font-heading: var(--font-outfit);
+    --font-brand: var(--font-outfit);
+    --font-body: var(--font-inter);
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-[#0f172a] text-light-text antialiased;
+    font-family: var(--font-body);
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Typography System Classes */
+  .font-headline {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .font-brand {
+    font-family: var(--font-brand);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
+
+  .font-body {
+    font-family: var(--font-body);
+    font-weight: 400;
+    line-height: 1.6;
+  }
+
+  .font-tagline {
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-emerald to-purple bg-clip-text text-transparent;
+  }
+
+  .glow-emerald {
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+  }
+
+  .glow-emerald-strong {
+    box-shadow: 0 0 30px rgba(16, 185, 129, 0.6), 0 0 60px rgba(16, 185, 129, 0.3);
+  }
+
+  .glow-purple {
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+  }
+
+  .glow-purple-strong {
+    box-shadow: 0 0 30px rgba(168, 85, 247, 0.6), 0 0 60px rgba(168, 85, 247, 0.3);
+  }
+
+  .perspective-card {
+    transform-style: preserve-3d;
+    perspective: 1000px;
+  }
+
+  .text-glow {
+    text-shadow: 0 0 20px rgba(16, 185, 129, 0.5), 0 0 40px rgba(16, 185, 129, 0.3);
+  }
+
+  .section-padding {
+    @apply px-4 py-16 md:px-8 md:py-24 lg:px-12;
+  }
+
+  .container-width {
+    @apply mx-auto max-w-7xl;
+  }
+
+  /* ==================== */
+  /* TEXTURE & VISUAL DEPTH */
+  /* ==================== */
+
+  /* Subtle grain texture */
+  .texture-grain {
+    background-image:
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='400' height='400' fill='white' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+  }
+
+  /* Subtle vignette effect (darker edges) */
+  .vignette {
+    position: relative;
+  }
+
+  .vignette::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.15) 100%);
+    pointer-events: none;
+  }
+
+  /* Smoke-like gradient overlay (subtle, not overwhelming) */
+  .smoke-overlay {
+    background: linear-gradient(135deg, rgba(90,45,130,0.05) 0%, rgba(13,125,109,0.05) 100%);
+  }
+
+  /* Subtle animated background noise */
+  .grain-animate {
+    animation: grain 8s steps(10) infinite;
+  }
+
+  /* ==================== */
+  /* HEADER NAVIGATION STYLES */
+  /* ==================== */
+
+  .nav-link {
+    position: relative;
+  }
+
+  .nav-link:hover .nav-link-underline,
+  .nav-link.active .nav-link-underline {
+    width: 100%;
+  }
+
+  .nav-link-underline {
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    height: 2px;
+    width: 0;
+    background: var(--primary-emerald);
+    transition: width 0.3s ease;
+  }
+}
+
+/* Custom scrollbar for dark theme */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #10b981;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #34d399;
+}
+
+/* Selection color */
+::selection {
+  background: #10b981;
+  color: #0f172a;
+}
+
+::-moz-selection {
+  background: #10b981;
+  color: #0f172a;
+}
+
+/* Focus visible for accessibility */
+*:focus-visible {
+  @apply outline-none ring-2 ring-emerald ring-offset-2 ring-offset-[#0f172a];
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* CSS 3D Cube Styles */
+.cube-3d {
+  animation: cubeFloat 6s ease-in-out infinite, cubeRotate 20s linear infinite;
+}
+
+@keyframes cubeFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes cubeRotate {
+  0% {
+    transform: rotateX(0deg) rotateY(0deg);
+  }
+  100% {
+    transform: rotateX(360deg) rotateY(360deg);
+  }
+}
+
+.cube-face {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  background: rgba(16, 185, 129, 0.1);
+  border: 2px solid rgba(16, 185, 129, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+.cube-face-front {
+  transform: translateZ(100px);
+}
+
+.cube-face-back {
+  transform: rotateY(180deg) translateZ(100px);
+}
+
+.cube-face-right {
+  transform: rotateY(90deg) translateZ(100px);
+}
+
+.cube-face-left {
+  transform: rotateY(-90deg) translateZ(100px);
+}
+
+.cube-face-top {
+  transform: rotateX(90deg) translateZ(100px);
+}
+
+.cube-face-bottom {
+  transform: rotateX(-90deg) translateZ(100px);
+}
+
+.cube-wireframe {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+
+.wire {
+  position: absolute;
+  background: linear-gradient(90deg, #10b981, #34d399);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+}
+
+.wire-0, .wire-1, .wire-2, .wire-3 {
+  width: 200px;
+  height: 2px;
+}
+
+.wire-4, .wire-5, .wire-6, .wire-7 {
+  width: 2px;
+  height: 200px;
+}
+
+.wire-8, .wire-9, .wire-10, .wire-11 {
+  width: 200px;
+  height: 2px;
+}
+
+.wire-0 {
+  top: 0;
+  left: 0;
+  transform: translateZ(100px);
+}
+
+.wire-1 {
+  bottom: 0;
+  left: 0;
+  transform: translateZ(100px);
+}
+
+.wire-2 {
+  top: 0;
+  left: 0;
+  transform: translateZ(-100px);
+}
+
+.wire-3 {
+  bottom: 0;
+  left: 0;
+  transform: translateZ(-100px);
+}
+
+.wire-4 {
+  top: 0;
+  left: 0;
+  transform: translateZ(100px);
+}
+
+.wire-5 {
+  top: 0;
+  right: 0;
+  transform: translateZ(100px);
+}
+
+.wire-6 {
+  top: 0;
+  left: 0;
+  transform: translateZ(-100px);
+}
+
+.wire-7 {
+  top: 0;
+  right: 0;
+  transform: translateZ(-100px);
+}
+
+.wire-8 {
+  top: 0;
+  left: 0;
+  transform: rotateY(90deg) translateZ(100px);
+}
+
+.wire-9 {
+  bottom: 0;
+  left: 0;
+  transform: rotateY(90deg) translateZ(100px);
+}
+
+.wire-10 {
+  top: 0;
+  left: 0;
+  transform: rotateY(90deg) translateZ(-100px);
+}
+
+.wire-11 {
+  bottom: 0;
+  left: 0;
+  transform: rotateY(90deg) translateZ(-100px);
+}
+
+/* ==================== */
+/* SMOKE RINGS ANIMATIONS */
+/* ==================== */
+
+@keyframes smokeRotateY {
+  0% {
+    transform: rotateY(0deg);
+  }
+  100% {
+    transform: rotateY(360deg);
+  }
+}
+
+@keyframes smokeRotateX {
+  0% {
+    transform: rotateX(0deg);
+  }
+  100% {
+    transform: rotateX(360deg);
+  }
+}
+
+@keyframes smokeRotateZ {
+  0% {
+    transform: rotateZ(0deg);
+  }
+  100% {
+    transform: rotateZ(360deg);
+  }
+}
+
+@keyframes smokePulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+}
+
+/* ==================== */
+/* GENERAL 3D ANIMATIONS */
+/* ==================== */
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.3), 0 0 40px rgba(168, 85, 247, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(16, 185, 129, 0.5), 0 0 60px rgba(168, 85, 247, 0.4);
+  }
+}
+
+@keyframes tilt {
+  0%, 100% {
+    transform: perspective(1000px) rotateX(0deg) rotateY(0deg);
+  }
+  25% {
+    transform: perspective(1000px) rotateX(2deg) rotateY(-2deg);
+  }
+  75% {
+    transform: perspective(1000px) rotateX(-2deg) rotateY(2deg);
+  }
+}
+
+@keyframes grain {
+  0%, 100% { opacity: 0.03; }
+  50% { opacity: 0.05; }
+}
+
+/* ==================== */
+/* PRODUCT ICON ANIMATIONS */
+/* ==================== */
+
+@keyframes leafWave {
+  0%, 100% {
+    transform: rotateZ(-5deg);
+  }
+  50% {
+    transform: rotateZ(5deg);
+  }
+}
+
+@keyframes flameFlicker {
+  0%, 100% {
+    transform: scaleY(1) translateY(0);
+    opacity: 1;
+  }
+  50% {
+    transform: scaleY(1.1) translateY(-2px);
+    opacity: 0.9;
+  }
+}
+
+@keyframes vapeGlow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.6), 0 0 30px rgba(16, 185, 129, 0.3);
+  }
+}
+
+@keyframes glassShine {
+  0% {
+    background-position: -100% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* ==================== */
+/* CARD & TESTIMONIAL EFFECTS */
+/* ==================== */
+
+@keyframes cardFlip {
+  0% {
+    transform: perspective(1000px) rotateY(0deg);
+  }
+  100% {
+    transform: perspective(1000px) rotateY(5deg);
+  }
+}
+
+@keyframes starGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 2px rgba(234, 179, 8, 0.5));
+  }
+  50% {
+    filter: drop-shadow(0 0 8px rgba(234, 179, 8, 0.8)) drop-shadow(0 0 12px rgba(16, 185, 129, 0.4));
+  }
+}
+
+/* ==================== */
+/* ACCORDION & FAQ EFFECTS */
+/* ==================== */
+
+@keyframes accordionFold {
+  from {
+    transform: perspective(1000px) rotateX(-10deg);
+    opacity: 0;
+  }
+  to {
+    transform: perspective(1000px) rotateX(0deg);
+    opacity: 1;
+  }
+}
+
+/* ==================== */
+/* PERFORMANCE OPTIMIZATIONS */
+/* ==================== */
+
+.smoke-ring,
+.product-icon-3d,
+.card-3d {
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-font-smoothing: subpixel-antialiased;
+}
