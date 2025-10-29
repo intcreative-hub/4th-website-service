@@ -15,18 +15,23 @@ import {
   LogOut,
   Menu,
   X,
-  Lock
+  Lock,
+  BarChart3,
+  Megaphone
 } from 'lucide-react'
 import { fadeInUp, slideInLeft } from '@/lib/animations'
 import toast from 'react-hot-toast'
 
 const navItems = [
   { href: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
+  { href: '/admin/analytics', icon: BarChart3, label: 'Analytics' },
   { href: '/admin/products', icon: ShoppingBag, label: 'Products' },
   { href: '/admin/orders', icon: ShoppingCart, label: 'Orders' },
   { href: '/admin/appointments', icon: Calendar, label: 'Appointments' },
   { href: '/admin/blog', icon: BookOpen, label: 'Blog' },
   { href: '/admin/reviews', icon: Star, label: 'Reviews' },
+  { href: '/admin/banners', icon: Megaphone, label: 'Banners' },
+  { href: '/admin/coupons', icon: Star, label: 'Coupons' },
   { href: '/admin/contacts', icon: Users, label: 'Contacts' },
 ]
 

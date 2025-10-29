@@ -19,6 +19,9 @@ import Link from 'next/link'
 import ProductCard from '@/components/ProductCard'
 import ReviewForm from '@/components/products/ReviewForm'
 import ReviewList from '@/components/products/ReviewList'
+import VariantSelector from '@/components/products/VariantSelector'
+import SocialShare from '@/components/products/SocialShare'
+import RecentlyViewed, { trackProductView } from '@/components/products/RecentlyViewed'
 import { useCartStore } from '@/lib/store'
 import { fadeInUp, staggerContainer, staggerItem, hoverScale, tapScale, hoverLift } from '@/lib/animations'
 import toast from 'react-hot-toast'
@@ -50,6 +53,8 @@ export default function ProductDetailPage() {
   const [selectedImage, setSelectedImage] = useState(0)
   const [addingToCart, setAddingToCart] = useState(false)
   const [isWishlisted, setIsWishlisted] = useState(false)
+  const [selectedVariant, setSelectedVariant] = useState<any>(null)
+  const [variantPrice, setVariantPrice] = useState<number | null>(null)
 
   const { addItem } = useCartStore()
 
@@ -63,6 +68,9 @@ export default function ProductDetailPage() {
 
         if (data.product) {
           setProduct(data.product)
+
+          // Track product view
+          trackProductView(data.product.id)
 
           // Fetch related products (same category)
           if (data.product.category) {
@@ -98,14 +106,24 @@ export default function ProductDetailPage() {
       addItem({
         id: product.id,
         name: product.name,
-        price: product.salePrice || product.price,
+        price: displayPrice,
         image: product.images[0],
         slug: product.slug,
+        variant: selectedVariant ? {
+          id: selectedVariant.id,
+          name: selectedVariant.name,
+          sku: selectedVariant.sku,
+          attributes: selectedVariant.attributes,
+        } : undefined,
       })
+
+      const itemName = selectedVariant
+        ? `${product.name} (${selectedVariant.name})`
+        : product.name
 
       toast.success(
         <div>
-          <strong>{product.name}</strong> added to cart!
+          <strong>{itemName}</strong> added to cart!
         </div>,
         {
           duration: 3000,
@@ -133,9 +151,11 @@ export default function ProductDetailPage() {
     })
   }
 
-  const displayPrice = product?.salePrice || product?.price || 0
+  // Use variant price if selected, otherwise use product price
+  const basePrice = variantPrice !== null ? variantPrice : (product?.salePrice || product?.price || 0)
+  const displayPrice = basePrice
   const originalPrice = product?.price || 0
-  const discount = product?.salePrice
+  const discount = product?.salePrice && !variantPrice
     ? Math.round(((originalPrice - product.salePrice) / originalPrice) * 100)
     : 0
 
@@ -352,6 +372,16 @@ export default function ProductDetailPage() {
                 </div>
               )}
 
+              {/* Product Variants */}
+              <VariantSelector
+                productId={product.id}
+                basePrice={product.salePrice || product.price}
+                onVariantChange={(variant, price) => {
+                  setSelectedVariant(variant)
+                  setVariantPrice(price)
+                }}
+              />
+
               {/* Stock Indicator */}
               <div className="flex items-center gap-2 text-sm">
                 <Package className="w-5 h-5 text-primary-emerald" />
@@ -458,6 +488,20 @@ export default function ProductDetailPage() {
                   </div>
                 </motion.div>
               </motion.div>
+
+              {/* Social Share */}
+              <motion.div
+                className="pt-6 border-t border-neutral-800"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+              >
+                <SocialShare
+                  url={`/shop/${product.slug}`}
+                  title={product.name}
+                  description={product.description}
+                />
+              </motion.div>
             </motion.div>
           </div>
         </div>
@@ -545,6 +589,50 @@ export default function ProductDetailPage() {
           </div>
         </section>
       )}
+
+      {/* Recently Viewed Products */}
+      <RecentlyViewed currentProductId={product.id} />
+
+      {/* JSON-LD Structured Data for SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Product',
+            name: product.name,
+            description: product.description,
+            image: product.images,
+            sku: product.id,
+            brand: {
+              '@type': 'Brand',
+              name: 'Your Brand Name',
+            },
+            offers: {
+              '@type': 'Offer',
+              url: `${typeof window !== 'undefined' ? window.location.origin : ''}/shop/${product.slug}`,
+              priceCurrency: 'USD',
+              price: product.salePrice || product.price,
+              priceValidUntil: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)
+                .toISOString()
+                .split('T')[0],
+              availability:
+                product.stock > 0
+                  ? 'https://schema.org/InStock'
+                  : 'https://schema.org/OutOfStock',
+              seller: {
+                '@type': 'Organization',
+                name: 'Your Company Name',
+              },
+            },
+            aggregateRating: {
+              '@type': 'AggregateRating',
+              ratingValue: '5',
+              reviewCount: '128',
+            },
+          }),
+        }}
+      />
 
       <style jsx global>{`
         .text-gradient-primary {

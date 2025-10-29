@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import Link from 'next/link'
 import {
   Plus,
   Edit,
@@ -11,7 +12,8 @@ import {
   DollarSign,
   Tag,
   Image as ImageIcon,
-  Save
+  Save,
+  Package2
 } from 'lucide-react'
 import { fadeInUp, staggerContainer, staggerItem, modalBackdrop, modalContent } from '@/lib/animations'
 import toast from 'react-hot-toast'
@@ -315,15 +317,24 @@ export default function ProductsManagement() {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-end gap-2">
+                      <Link
+                        href={`/admin/products/${product.id}/variants`}
+                        className="p-2 hover:bg-neutral-800 rounded-lg text-neutral-400 hover:text-primary-purple transition-all"
+                        title="Manage Variants"
+                      >
+                        <Package2 className="w-4 h-4" />
+                      </Link>
                       <button
                         onClick={() => handleOpenModal(product)}
                         className="p-2 hover:bg-neutral-800 rounded-lg text-neutral-400 hover:text-primary-emerald transition-all"
+                        title="Edit Product"
                       >
                         <Edit className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleDelete(product.id, product.name)}
                         className="p-2 hover:bg-neutral-800 rounded-lg text-neutral-400 hover:text-red-400 transition-all"
+                        title="Delete Product"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>

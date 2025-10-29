@@ -3,6 +3,8 @@ import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
 import { SITE_CONFIG, SEO } from "@/lib/config";
 import ToastProvider from "@/components/ToastProvider";
+import PromoBanner from "@/components/PromoBanner";
+import ExitIntentPopup from "@/components/ExitIntentPopup";
 
 // Typography System - Three-Tier Hierarchy
 const inter = Inter({
@@ -106,6 +108,8 @@ export default function RootLayout({
       </head>
       <body className="font-sans">
         <ToastProvider />
+        <PromoBanner />
+        <ExitIntentPopup />
         {children}
       </body>
     </html>

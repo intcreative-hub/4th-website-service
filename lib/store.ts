@@ -9,9 +9,14 @@ export type CartItem = {
   quantity: number
   slug: string
   variant?: {
+    id?: string
+    name?: string
+    sku?: string
+    attributes?: Record<string, string>
+    // Legacy support for simple variants
     size?: string
     color?: string
-    [key: string]: string | undefined
+    [key: string]: any
   }
 }
 
