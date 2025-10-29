@@ -10,14 +10,22 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// User model for future authentication
+// User model for customer authentication (4th Tier)
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  role      String   @default("user") // user, admin
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        String    @id @default(cuid())
+  email     String    @unique
+  password  String    // bcrypt hashed password
+  name      String
+  phone     String?
+  role      String    @default("customer") // customer, admin
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  orders    Order[]   @relation("CustomerOrders")
+  addresses Address[]
+  wishlist  Wishlist[]
+  reviews   Review[]
+
+  @@index([email])
 }
 
 // Contact form submissions
@@ -80,23 +88,27 @@ model BlogPost {
 
 // E-commerce products
 model Product {
-  id          String      @id @default(cuid())
-  name        String
-  slug        String      @unique
-  description String      @db.Text
-  price       Float
-  salePrice   Float?
-  images      String[]    // Array of image URLs
-  category    String
-  stock       Int         @default(0)
-  sku         String?     @unique
-  featured    Boolean     @default(false)
-  active      Boolean     @default(true)
-  tags        String[]
-  variants    Json?       // For sizes, colors, etc.
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  orderItems  OrderItem[]
+  id              String           @id @default(cuid())
+  name            String
+  slug            String           @unique
+  description     String           @db.Text
+  price           Float
+  salePrice       Float?
+  images          String[]         // Array of image URLs
+  category        String
+  stock           Int              @default(0)
+  sku             String?          @unique
+  featured        Boolean          @default(false)
+  active          Boolean          @default(true)
+  tags            String[]
+  variants        Json?            // Legacy: For sizes, colors, etc.
+  badges          String[]         @default([]) // NEW: Product badges (New, Sale, Featured, Bestseller)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  orderItems      OrderItem[]
+  productVariants ProductVariant[] // NEW: Proper variant tracking
+  reviews         Review[]         // NEW: Product reviews
+  wishlist        Wishlist[]       // NEW: Wishlist items
 
   @@index([slug])
   @@index([category])
@@ -108,6 +120,8 @@ model Product {
 model Order {
   id              String      @id @default(cuid())
   orderNumber     String      @unique
+  userId          String?     // NEW: Link to customer account (optional for guest checkout)
+  user            User?       @relation("CustomerOrders", fields: [userId], references: [id])
   customerName    String
   customerEmail   String
   customerPhone   String?
@@ -116,6 +130,8 @@ model Order {
   subtotal        Float
   tax             Float       @default(0)
   shipping        Float       @default(0)
+  discount        Float       @default(0) // NEW: Coupon discount
+  couponCode      String?     // NEW: Applied coupon code
   total           Float
   status          String      @default("pending") // pending, processing, shipped, delivered, cancelled
   paymentStatus   String      @default("pending") // pending, paid, failed, refunded
@@ -126,6 +142,7 @@ model Order {
   orderItems      OrderItem[]
 
   @@index([orderNumber])
+  @@index([userId])
   @@index([customerEmail])
   @@index([status])
   @@index([createdAt])
@@ -162,4 +179,119 @@ model Newsletter {
 
   @@index([email])
   @@index([status])
+}
+
+// =========================================
+// 4TH TIER ($1000) NEW MODELS
+// =========================================
+
+// Customer saved addresses
+model Address {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  street    String
+  city      String
+  state     String
+  zip       String
+  country   String   @default("USA")
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([isDefault])
+}
+
+// Customer wishlist
+model Wishlist {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId]) // Prevent duplicate wishlist items
+  @@index([userId])
+  @@index([productId])
+}
+
+// Product reviews with moderation
+model Review {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rating    Int      // 1-5 stars
+  comment   String   @db.Text
+  approved  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([productId])
+  @@index([userId])
+  @@index([approved])
+  @@index([createdAt])
+}
+
+// Product variants (size, color, etc.) with inventory tracking
+model ProductVariant {
+  id         String   @id @default(cuid())
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  name       String   // e.g., "Small - Blue"
+  sku        String   @unique
+  price      Float?   // Override product price if different
+  stock      Int      @default(0)
+  attributes Json     // { size: "S", color: "blue" }
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([productId])
+  @@index([sku])
+  @@index([active])
+}
+
+// Coupon/discount codes
+model Coupon {
+  id          String    @id @default(cuid())
+  code        String    @unique
+  description String?
+  discount    Float     // Amount or percentage
+  type        String    // "PERCENTAGE" | "FIXED"
+  minPurchase Float?    // Minimum purchase amount
+  maxUses     Int?      // Maximum total uses
+  usedCount   Int       @default(0)
+  expiresAt   DateTime?
+  active      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([code])
+  @@index([active])
+  @@index([expiresAt])
+}
+
+// Promotional banners
+model PromoBanner {
+  id        String    @id @default(cuid())
+  title     String
+  message   String    @db.Text
+  link      String?
+  linkText  String?   @default("Learn More")
+  bgColor   String?   @default("gradient") // gradient, purple, emerald, custom
+  startDate DateTime?
+  endDate   DateTime?
+  priority  Int       @default(0) // Higher number = higher priority
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([active])
+  @@index([priority])
+  @@index([startDate])
+  @@index([endDate])
 }
